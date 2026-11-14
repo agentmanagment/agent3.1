@@ -120,7 +120,8 @@
     async security(user) {
       for (const o of await readTab('security')) {
         if (lc(pick(o, 'username', 'user')) === lc(user) && lc(pick(o, 'status')) === 'pending') {
-          return { method: pick(o, 'method') || 'USDT', amount: pick(o, 'amount', 'amound'), address: pick(o, 'usdtaddress', 'address', 'usdt'), qr: pick(o, 'qrlogo', 'qr'), agentType: pick(o, 'agenttype', 'type') };
+          const amtKeys = Object.keys(o).filter(k => k.startsWith('amo') || k.includes('amount') || k.includes('amound'));
+          return { method: pick(o, 'method') || 'USDT', amount: pick(o, 'amount', 'amound', ...amtKeys, 'c2'), address: pick(o, 'usdtaddress', 'address', 'usdt'), qr: pick(o, 'qrlogo', 'qr'), agentType: pick(o, 'agenttype', 'type') };
         }
       }
       return null;
@@ -236,7 +237,7 @@
     const s = sheet({
       title: 'Security Deposit',
       bodyHTML: `<div id="secSheet" class="sec">
-        <div class="sec-hero">${icon('shield')}<div><small>${esc(p.agentType || 'Agent')} · ${esc(p.method)}</small><div class="sec-amt">${esc(p.amount)} <span>USDT</span></div></div></div>
+        <div class="sec-hero">${icon('shield')}<div><small>${esc(p.agentType || 'Agent')} · ${esc(p.method)}</small><div class="sec-amt">${esc(num(p.amount) ? num(p.amount).toLocaleString('en-US') : p.amount)} <span>USDT</span></div></div></div>
         ${p.qr ? `<div class="qr"><img src="${esc(p.qr)}" alt="Payment QR code" referrerpolicy="no-referrer"></div>` : ''}
         <label class="lbl">Wallet address</label>
         <div class="addr"><code>${esc(p.address)}</code><button class="chip" data-copy="${esc(p.address)}">${icon('copy')}Copy</button></div>
