@@ -3,7 +3,8 @@
 // ============================================================
 window.PORTAL = {
   name: 'Agent Portal',
-  LOGO: 'https://managment.io/img/logo.svg',
+  LOGO: 'img/logo.svg',            // local copy (GitHub repo mein img/logo.svg upload karo)
+  LOGO_REMOTE: 'https://managment.io/img/logo.svg',
   SRC: {
     users:       { sheet: '1ceJEL9omxk8btcFyaXTkLte7qSy6nVuPOtW8O3OI3F8' },
     withdrawals: { sheet: '1cpiLFItR6XLTookeZT5-9QJqcgJv28pQ3lMaNc2AlaQ', api: 'k76oqu1eo6sxg' },
