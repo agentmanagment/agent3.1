@@ -176,8 +176,13 @@
   const row = (label, value, copyVal) => `<div class="kv"><span>${esc(label)}</span><b>${value}${copyVal ? `<button class="chip" data-copy="${esc(copyVal)}">${icon('copy')}Copy</button>` : ''}</b></div>`;
 
   /* ---------- logo ---------- */
-  const LOGO=C.LOGO;
-  const logoImg=()=>`<img class="logo" src="${LOGO}" alt="${esc(C.name)}" referrerpolicy="no-referrer" onerror="this.outerHTML='<div class=&quot;mark&quot;>A</div>'">`;
+  const LOGO=C.LOGO, LOGO_REMOTE=C.LOGO_REMOTE;
+  // local logo first -> remote logo -> letter badge (never an empty space)
+  window.__logoFail=function(img){
+    if(!img.dataset.f && LOGO_REMOTE && img.src.indexOf(LOGO_REMOTE)<0){ img.dataset.f=1; img.src=LOGO_REMOTE; return; }
+    const m=document.createElement('div'); m.className='mark'; m.textContent='A'; img.replaceWith(m);
+  };
+  const logoImg=(cls='')=>`<img class="logo ${cls}" src="${LOGO}" alt="${esc(C.name)}" referrerpolicy="no-referrer" onerror="__logoFail(this)">`;
 
   /* ---------- shell ---------- */
   const NAV = [['dashboard.html', 'Overview', 'home'], ['withdrawal.html', 'Withdrawals', 'out'], ['deposit.html', 'Deposits', 'in'], ['commission.html', 'Commission', 'pct'], ['banks.html', 'Bank Accounts', 'bank']];
@@ -197,7 +202,7 @@
         </div>
       </aside>
       <main class="main">
-        <header class="topbar"><button class="icon-btn menu" id="menuBtn" aria-label="Menu">${icon('menu')}</button><div><h1>${esc(title)}</h1><p>${esc(subtitle || '')}</p></div></header>
+        <header class="topbar"><button class="icon-btn menu" id="menuBtn" aria-label="Menu">${icon('menu')}</button><div class="top-logo">${logoImg()}</div><div class="top-title"><h1>${esc(title)}</h1><p>${esc(subtitle || '')}</p></div></header>
         <section id="page"></section>
       </main>`;
     $('#menuBtn').onclick = () => document.body.classList.toggle('nav-open');
@@ -234,10 +239,12 @@
     let p; try { p = await Data.security(u.username); } catch (e) { return; }
     if (!p) return;
     const submitted = store.get('ap.secSubmitted.' + u.username, false);
+    const amtNum = num(p.amount);
+    const amtTxt = amtNum ? `$${amtNum.toLocaleString('en-US')} <span>USDT</span>` : (p.amount ? `${esc(p.amount)} <span>USDT</span>` : `<span>Amount not set</span>`);
     const s = sheet({
       title: 'Security Deposit',
       bodyHTML: `<div id="secSheet" class="sec">
-        <div class="sec-hero">${icon('shield')}<div><small>${esc(p.agentType || 'Agent')} · ${esc(p.method)}</small><div class="sec-amt">${esc(num(p.amount) ? num(p.amount).toLocaleString('en-US') : p.amount)} <span>USDT</span></div></div></div>
+        <div class="sec-hero">${icon('shield')}<div class="sec-info"><small>${esc(p.agentType || 'Agent')} · ${esc(p.method)}</small><div class="sec-amt">${amtTxt}</div></div></div>
         ${p.qr ? `<div class="qr"><img src="${esc(p.qr)}" alt="Payment QR code" referrerpolicy="no-referrer"></div>` : ''}
         <label class="lbl">Wallet address</label>
         <div class="addr"><code>${esc(p.address)}</code><button class="chip" data-copy="${esc(p.address)}">${icon('copy')}Copy</button></div>
