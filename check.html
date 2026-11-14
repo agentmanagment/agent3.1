@@ -1,0 +1,9 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Setup check</title><link rel="stylesheet" href="css/style.css">
+<style>body{padding:24px;max-width:760px;margin:auto}.r{display:flex;gap:12px;padding:14px 0;border-bottom:1px solid var(--line)}.d{width:12px;height:12px;border-radius:50%;margin-top:6px;flex:none}.ok{background:var(--green)}.bad{background:var(--red)}small{color:var(--ink2);display:block}</style></head>
+<body><h1>Setup check</h1><p style="color:var(--ink2);margin:6px 0 18px">Owner only — delete before sharing.</p><div id="o"></div>
+<script src="js/config.js"></script><script>
+(async()=>{const o=document.getElementById('o');
+for(const k in PORTAL.SRC){let c='bad',m='';try{const r=await fetch(`https://docs.google.com/spreadsheets/d/${PORTAL.SRC[k].sheet}/gviz/tq?tqx=out:csv`,{cache:'no-store'});const x=await r.text();
+ if(!r.ok||/^\s*<(!doctype|html)/i.test(x))m='Cannot read — sheet not shared as “Anyone with the link → Viewer”.';else{c='ok';m=(x.trim().split('\n').length-1)+' data row(s). Headers: '+x.split('\n')[0].replace(/"/g,'');}}catch(e){m='No connection.';}
+ o.insertAdjacentHTML('beforeend',`<div class="r"><span class="d ${c}"></span><div><b>${k}</b><small>${m}</small></div></div>`);}})();
+</script></body></html>
